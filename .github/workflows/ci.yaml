@@ -2,8 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    branches
-      - fix-ci
+    branches:
+      - fix-ci  
 
 jobs:
   build:
