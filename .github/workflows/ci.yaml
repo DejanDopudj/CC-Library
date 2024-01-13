@@ -2,7 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main  
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
     - name: Build the Docker image
-      run: docker build ./central-library --file Dockerfile --tag dopudjdejan/central-library:latest
+      run: docker build ./central-library --tag dopudjdejan/central-library:latest
 
     - name: Docker Push
       run: docker push dopudjdejan/central-library:latest
