@@ -2,7 +2,7 @@ version: '3'
 services:
   central-library:
     container_name: central-library
-    build: ./central-library
+    image: dopudjdejan/central-library
     ports: 
       - "80:80"
     volumes: 
