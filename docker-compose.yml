@@ -7,3 +7,27 @@ services:
       - "80:80"
     volumes: 
       - ./central-library:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      - MYSQL_DATABASE=library
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 5s
+        retries: 2
+    volumes:
+      - my-db:/var/lib/mysql
+    
+volumes:
+  my-db:
