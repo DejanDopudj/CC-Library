@@ -30,7 +30,7 @@ spec:
           volumeMounts:
             - name: ns-data
               mountPath: /var/lib/mysqlns
-        - name: ns-library-service
+        - name: ns-library
           image: dopudjdejan/local-library
           command:
             [

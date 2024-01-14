@@ -2,7 +2,8 @@ version: '3'
 services:
   central-library:
     container_name: central-library
-    image: dopudjdejan/central-library
+    build: ./central-library
+    # image: dopudjdejan/central-library
     environment:
       - DATABASE_HOST=db
     ports: 
@@ -15,7 +16,8 @@ services:
 
   ns-library:
     container_name: ns-library
-    image: dopudjdejan/local-library:latest
+    build: ./local-library
+    # image: dopudjdejan/local-library:latest
     environment:
       - DATABASE_HOST=db
       - LOCAL_DATABASE=ns
@@ -28,6 +30,40 @@ services:
       db:
         condition: service_healthy
     command: uvicorn main:app --host 0.0.0.0 --port 82 --reload
+
+  bg-library:
+    container_name: bg-library
+    build: ./local-library
+    # image: dopudjdejan/local-library:latest
+    environment:
+      - DATABASE_HOST=db
+      - LOCAL_DATABASE=bg
+      - DATABASE_PORT=3306
+    ports: 
+      - "83:83"
+    volumes: 
+      - ./local-library:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 83 --reload
+
+  nis-library:
+    container_name: nis-library
+    build: ./local-library
+    # image: dopudjdejan/local-library:latest
+    environment:
+      - DATABASE_HOST=db
+      - LOCAL_DATABASE=nis
+      - DATABASE_PORT=3306
+    ports: 
+      - "84:84"
+    volumes: 
+      - ./local-library:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 84 --reload
 
   db:
     image: mysql:latest

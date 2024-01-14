@@ -39,7 +39,7 @@ def read_user_api(user_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-@app.post("/users/items/", response_model=Item)
+@app.post("/users/items/", response_model=str)
 def create_item_for_user_api(
     item: ItemCreate, db: Session = Depends(get_db)
 ):
@@ -59,6 +59,6 @@ def return_item_api(item_id: str, db: Session = Depends(get_db)):
     return_item(db=db, item_id=item_id)
     return None
 
-@app.get("/check_items/{user_id}", response_model=bool)
+@app.get("/check_items/{user_id}", response_model=str)
 def check_items_api(user_id: str, db: Session = Depends(get_db)):
     return check_items(db=db, user_id=user_id)
