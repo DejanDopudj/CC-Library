@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bg-library
+spec:
+  selector:
+    app: bg-library-app
+  ports:
+    - protocol: TCP
+      port: 83
+      targetPort: 83
