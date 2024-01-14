@@ -1,35 +1,26 @@
 from pydantic import BaseModel
 
-
-class ItemBase(BaseModel):
+class BookBase(BaseModel):
     title: str
-    description: str | None = None
+    author: str
 
-
-class ItemCreate(ItemBase):
+class BookCreate(BookBase):
     pass
 
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
+class Book(BookBase):
+    id: str
 
     class Config:
         orm_mode = True
 
+class LoanBase(BaseModel):
+    book_id: str
 
-class UserBase(BaseModel):
-    email: str
+class LoanCreate(LoanBase):
+    user_id: str
 
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: list[Item] = []
+class Loan(LoanBase):
+    id: str
 
     class Config:
         orm_mode = True

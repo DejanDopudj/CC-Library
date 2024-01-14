@@ -30,7 +30,7 @@ spec:
           volumeMounts:
             - name: central-data
               mountPath: /var/lib/mysql
-        - name: central-library-service
+        - name: central-library
           image: dopudjdejan/central-library
           ports:
             - containerPort: 81

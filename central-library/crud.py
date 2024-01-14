@@ -38,15 +38,16 @@ def return_item(db: Session, item_id: str):
 
 def check_items(db: Session, user_id:str):
     items = db.query(Item).filter(Item.owner_id == user_id, Item.returned == False).count()
-    return items >= 3
+    return "not_eligible" if items >= 3 else "eligible"
 
 def create_user_item(db: Session, item: ItemCreate):
+    idd = uuid.uuid4().hex
     db_item = Item(
-        id=uuid.uuid4(),
+        id=str(idd),
         returned=False,
         owner_id=item.owner_id
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
-    return db_item
+    return idd

@@ -1,26 +1,20 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-
+from uuid import UUID, uuid4
 from database import Base
+from sqlalchemy import Column, String, Date, Boolean, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from datetime import date
 
 
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True)
-    email = Column(String(160), unique=True, index=True)
-    hashed_password = Column(String(160))
-    is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
+class Book(Base):
+    __tablename__ = "book"
+    id = Column(String(160), primary_key=True, default=uuid4)
+    title = Column(String(160))
+    author = Column(String(160))
 
 
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String(160), index=True)
-    description = Column(String(160), index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="items")
+class Loan(Base):
+    __tablename__ = "loan"
+    id = Column(String(160), primary_key=True, default=uuid4)
+    book_id = Column(String(160), ForeignKey("book.id"))
+    date_took = Column(Date, default=date.today())
+    date_returned = Column(Date, default=None)

@@ -16,13 +16,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: central-library-service
+                name: central-library
                 port:
                   number: 81
           - path: /ns(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: ns-library-service
+                name: ns-library
                 port:
                   number: 82

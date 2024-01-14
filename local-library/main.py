@@ -3,9 +3,11 @@ from sqlalchemy.orm import Session
 
 from crud import *
 from models import Base
-from schemas import UserCreate, ItemCreate,User, Item
+from schemas import BookCreate, LoanCreate,Book, Loan
 from database import SessionLocal, engine
 import os
+import requests
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(openapi_prefix=f"/{os.getenv('LOCAL_DATABASE')}")
@@ -19,37 +21,33 @@ def get_db():
     finally:
         db.close()
 
+# Endpoint to create a book
+@app.post("/books/", response_model=Book)
+def create_book_api(book_data: BookCreate, db: Session = Depends(get_db)):
+    return create_book(db, book_data)
 
-@app.post("/users/", response_model=User)
-def create_user_api(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return create_user(db=db, user=user)
+# Endpoint to get a book by ID
+@app.get("/books/{book_id}", response_model=Book)
+def get_book_api(book_id: str, db: Session = Depends(get_db)):
+    db_book = get_book(db, book_id)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return db_book
 
+# Endpoint to create a loan
+@app.post("/loans/", response_model=Loan)
+def create_loan_api(loan_data: LoanCreate, db: Session = Depends(get_db)):
+    response = requests.get(url=f"http://central-library:81/central/check_items/{loan_data.user_id}").text
+    if response.replace("\"", "").strip() == "eligible":  
+        id = requests.post(url=f"http://central-library:81/central/users/items/", json={"owner_id": f"{loan_data.user_id}"}).content
+        return create_loan(db, loan_data, id)
+    else:
+        raise HTTPException(status_code=404, detail="User not eligible")
 
-@app.get("/users/", response_model=list[User])
-def read_users_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = get_users(db, skip=skip, limit=limit)
-    return users
-
-
-@app.get("/users/{user_id}", response_model=User)
-def read_user_api(user_id: int, db: Session = Depends(get_db)):
-    db_user = get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-
-@app.post("/users/{user_id}/items/", response_model=Item)
-def create_item_for_user_api(
-    user_id: int, item: ItemCreate, db: Session = Depends(get_db)
-):
-    return create_user_item(db=db, item=item, user_id=user_id)
-
-
-@app.get("/items/", response_model=list[Item])
-def read_items_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = get_items(db, skip=skip, limit=limit)
-    return items
+# Endpoint to get a loan by ID
+@app.get("/loans/{loan_id}", response_model=Loan)
+def read_loan_api(loan_id: str, db: Session = Depends(get_db)):
+    db_loan = get_loan(db, loan_id)
+    if db_loan is None:
+        raise HTTPException(status_code=404, detail="Loan not found")
+    return db_loan

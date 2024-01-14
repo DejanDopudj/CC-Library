@@ -1,37 +1,35 @@
 from sqlalchemy.orm import Session
 
-from models import User, Item
-from schemas import UserCreate, ItemCreate
+from datetime import date
+from models import Book, Loan
+from schemas import BookCreate, LoanCreate
+import uuid
 
-
-def get_user(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
-
-
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
-
-
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(User).offset(skip).limit(limit).all()
-
-
-def create_user(db: Session, user: UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = User(email=user.email, hashed_password=fake_hashed_password)
-    db.add(db_user)
+def create_book(db: Session, book_data: BookCreate):
+    db_book = Book(id=uuid.uuid4(), title=book_data.title, author=book_data.author)
+    db.add(db_book)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_book)
+    return db_book
 
-
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: ItemCreate, user_id: int):
-    db_item = Item(**item.dict(), owner_id=user_id)
-    db.add(db_item)
+def create_loan(db: Session, loan_data: LoanCreate, id: str):
+    db_loan = Loan(
+        id = id.decode("utf-8").replace("\"", ""),
+        book_id=loan_data.book_id,
+        date_took=date.today(),
+        date_returned=None
+    )
+    db.add(db_loan)
     db.commit()
-    db.refresh(db_item)
-    return db_item
+    db.refresh(db_loan)
+    return db_loan
+
+def return_loan(loan_id: str):
+    db.query(Loan).filter(Loan.id == loan_id).update({"date_returned": date.now()})
+    db.commit()
+
+def get_book(db: Session, book_id: str):
+    return db.query(Book).filter(Book.id == book_id).first()
+
+def get_loan(db: Session, loan_id: str):
+    return db.query(Loan).filter(Loan.id == loan_id).first()

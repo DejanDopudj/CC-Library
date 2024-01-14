@@ -5,7 +5,6 @@ class ItemBase(BaseModel):
     pass
 
 class ItemCreate(ItemBase):
-    id: str
     owner_id: str
 
 
