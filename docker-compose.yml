@@ -2,8 +2,7 @@ version: '3'
 services:
   central-library:
     container_name: central-library
-    build: ./central-library
-    # image: dopudjdejan/central-library
+    image: dopudjdejan/central-library
     environment:
       - DATABASE_HOST=db
     ports: 
@@ -16,8 +15,7 @@ services:
 
   ns-library:
     container_name: ns-library
-    build: ./local-library
-    # image: dopudjdejan/local-library:latest
+    image: dopudjdejan/local-library:latest
     environment:
       - DATABASE_HOST=db
       - LOCAL_DATABASE=ns
