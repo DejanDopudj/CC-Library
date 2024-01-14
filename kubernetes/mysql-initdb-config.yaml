@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    CREATE DATABASE IF NOT EXISTS `ns`;
+    CREATE DATABASE IF NOT EXISTS `bg`;
+    CREATE DATABASE IF NOT EXISTS `nis`;
+    CREATE DATABASE IF NOT EXISTS `library`;

@@ -3,20 +3,37 @@ services:
   central-library:
     container_name: central-library
     image: dopudjdejan/central-library
+    environment:
+      - DATABASE_HOST=db
     ports: 
-      - "80:80"
+      - "81:81"
     volumes: 
       - ./central-library:/app
     depends_on:
       db:
         condition: service_healthy
 
+  ns-library:
+    container_name: ns-library
+    image: dopudjdejan/local-library:latest
+    environment:
+      - DATABASE_HOST=db
+      - LOCAL_DATABASE=ns
+      - DATABASE_PORT=3306
+    ports: 
+      - "82:82"
+    volumes: 
+      - ./local-library:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 82 --reload
 
   db:
     image: mysql:latest
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
     environment:
-      - MYSQL_DATABASE=library
       - MYSQL_ROOT_PASSWORD=root
     ports:
       - '3306:3306'
@@ -27,6 +44,7 @@ services:
         timeout: 5s
         retries: 2
     volumes:
+      - ./local-library/init:/docker-entrypoint-initdb.d
       - my-db:/var/lib/mysql
     
 volumes:
