@@ -1,26 +1,26 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-
+from datetime import date
 from database import Base
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "member"
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String(160), unique=True, index=True)
-    hashed_password = Column(String(160))
-    is_active = Column(Boolean, default=True)
+    id = Column(String(160), primary_key=True)
+    name = Column(String(160),  index=True)
+    surname = Column(String(160), index=True)
+    address = Column(String(160),  index=True)
+    
 
     items = relationship("Item", back_populates="owner")
 
 
 class Item(Base):
-    __tablename__ = "items"
+    __tablename__ = "book"
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String(160), index=True)
-    description = Column(String(160), index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    id = Column(String(160), primary_key=True)
+    owner_id = Column(String(160), ForeignKey("member.id"))
+    returned = Column(Boolean)
 
     owner = relationship("User", back_populates="items")
