@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nis-library
+spec:
+  selector:
+    app: nis-library-app
+  ports:
+    - protocol: TCP
+      port: 84
+      targetPort: 84

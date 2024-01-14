@@ -33,3 +33,10 @@ spec:
                 name: bg-library
                 port:
                   number: 83
+          - path: /nis(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: nis-library
+                port:
+                  number: 84

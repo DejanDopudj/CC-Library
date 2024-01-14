@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nis-library-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nis-library-app
+  template:
+    metadata:
+      labels:
+        app: nis-library-app
+    spec:
+      volumes:
+        - name: nis-data
+          persistentVolumeClaim:
+            claimName: cl-pvc
+      containers:
+        - name: nis-db
+          image: mysql:latest
+          env:
+            - name: MYSQL_DATABASE
+              value: nis
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 3309
+          volumeMounts:
+            - name: nis-data
+              mountPath: /var/lib/mysqlnis
+        - name: nis-library
+          image: dopudjdejan/local-library
+          command:
+            [
+              "uvicorn",
+              "main:app",
+              "--reload",
+              "--host",
+              "0.0.0.0",
+              "--port",
+              "84",
+            ]
+          ports:
+            - containerPort: 84
+          env:
+            - name: DATABASE_HOST
+              value: localhost
+            - name: LOCAL_DATABASE
+              value: nis
+            - name: DATABASE_PORT
+              value: '3309'
