@@ -26,3 +26,10 @@ spec:
                 name: ns-library
                 port:
                   number: 82
+          - path: /bg(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: bg-library
+                port:
+                  number: 83

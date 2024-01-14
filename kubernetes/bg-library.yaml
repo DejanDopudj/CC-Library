@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bg-library-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bg-library-app
+  template:
+    metadata:
+      labels:
+        app: bg-library-app
+    spec:
+      volumes:
+        - name: bg-data
+          persistentVolumeClaim:
+            claimName: cl-pvc
+      containers:
+        - name: bg-db
+          image: mysql:latest
+          env:
+            - name: MYSQL_DATABASE
+              value: bg
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 3308
+          volumeMounts:
+            - name: bg-data
+              mountPath: /var/lib/mysqlbg
+        - name: bg-library
+          image: dopudjdejan/local-library
+          command:
+            [
+              "uvicorn",
+              "main:app",
+              "--reload",
+              "--host",
+              "0.0.0.0",
+              "--port",
+              "83",
+            ]
+          ports:
+            - containerPort: 83
+          env:
+            - name: DATABASE_HOST
+              value: localhost
+            - name: LOCAL_DATABASE
+              value: bg
+            - name: DATABASE_PORT
+              value: '3308'

@@ -38,11 +38,18 @@ def get_book_api(book_id: str, db: Session = Depends(get_db)):
 @app.post("/loans/", response_model=Loan)
 def create_loan_api(loan_data: LoanCreate, db: Session = Depends(get_db)):
     response = requests.get(url=f"http://central-library:81/central/check_items/{loan_data.user_id}").text
-    if response.replace("\"", "").strip() == "eligible":  
-        id = requests.post(url=f"http://central-library:81/central/users/items/", json={"owner_id": f"{loan_data.user_id}"}).content
-        return create_loan(db, loan_data, id)
+    user_existent = requests.get(url=f"http://central-library:81/central/users/{loan_data.user_id}").status_code
+    if user_existent == 200:
+        if get_book(db, loan_data.book_id) is not None:
+            if response.replace("\"", "").strip() == "eligible":  
+                id = requests.post(url=f"http://central-library:81/central/users/items/", json={"owner_id": f"{loan_data.user_id}"}).content
+                return create_loan(db, loan_data, id)
+            else:
+                raise HTTPException(status_code=404, detail="User not eligible")
+        else:
+            raise HTTPException(status_code=404, detail="Book not found")
     else:
-        raise HTTPException(status_code=404, detail="User not eligible")
+        raise HTTPException(status_code=404, detail="User not existent")
 
 # Endpoint to get a loan by ID
 @app.get("/loans/{loan_id}", response_model=Loan)
