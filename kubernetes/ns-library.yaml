@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ns-library-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ns-library-app
+  template:
+    metadata:
+      labels:
+        app: ns-library-app
+    spec:
+      volumes:
+        - name: ns-data
+          persistentVolumeClaim:
+            claimName: cl-pvc
+      containers:
+        - name: ns-db
+          image: mysql:latest
+          env:
+            - name: MYSQL_DATABASE
+              value: ns
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 3307
+          volumeMounts:
+            - name: ns-data
+              mountPath: /var/lib/mysqlns
+        - name: ns-library-service
+          image: dopudjdejan/local-library
+          command:
+            [
+              "uvicorn",
+              "main:app",
+              "--reload",
+              "--host",
+              "0.0.0.0",
+              "--port",
+              "82",
+            ]
+          ports:
+            - containerPort: 82
+          env:
+            - name: DATABASE_HOST
+              value: localhost
+            - name: LOCAL_DATABASE
+              value: ns
+            - name: DATABASE_PORT
+              value: '3307'

@@ -33,4 +33,7 @@ spec:
         - name: central-library-service
           image: dopudjdejan/central-library
           ports:
-            - containerPort: 80
+            - containerPort: 81
+          env:
+            - name: DATABASE_HOST
+              value: localhost
