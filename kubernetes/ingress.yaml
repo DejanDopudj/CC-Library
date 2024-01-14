@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  labels:
+    name: my-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: library.com
+      http:
+        paths:
+          - path: /central(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: central-library-service
+                port:
+                  number: 80

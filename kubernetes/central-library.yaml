@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: central-library-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: central-library-app
+  template:
+    metadata:
+      labels:
+        app: central-library-app
+    spec:
+      volumes:
+        - name: central-data
+          persistentVolumeClaim:
+            claimName: cl-pvc
+      containers:
+        - name: central-db
+          image: mysql:latest
+          env:
+            - name: MYSQL_DATABASE
+              value: library
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: central-data
+              mountPath: /var/lib/mysql
+        - name: central-library-service
+          image: dopudjdejan/central-library
+          ports:
+            - containerPort: 80

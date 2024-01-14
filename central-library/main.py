@@ -8,7 +8,7 @@ from database import SessionLocal, engine
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(openapi_prefix="/central")
 
 
 # Dependency
