@@ -24,8 +24,8 @@ def create_loan(db: Session, loan_data: LoanCreate, id: str):
     db.refresh(db_loan)
     return db_loan
 
-def return_loan(loan_id: str):
-    db.query(Loan).filter(Loan.id == loan_id).update({"date_returned": date.now()})
+def return_loan(db: Session, loan_id: str):
+    db.query(Loan).filter(Loan.id == loan_id).update({"date_returned": date.today()})
     db.commit()
 
 def get_book(db: Session, book_id: str):

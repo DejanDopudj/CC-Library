@@ -24,3 +24,13 @@ class Loan(LoanBase):
 
     class Config:
         orm_mode = True
+
+class UserBase(BaseModel):
+    pass
+
+
+class UserCreate(UserBase):
+    id: str
+    name: str
+    surname: str
+    address: str
