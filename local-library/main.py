@@ -22,6 +22,8 @@ def get_db():
 
 @app.post("/books/", response_model=Book)
 def create_book_api(book_data: BookCreate, db: Session = Depends(get_db)):
+    if check_book_isbn(db, book_data.isbn) is not None:
+        raise HTTPException(status_code=404, detail="Book with isbn already exists")
     return create_book(db, book_data)
 
 @app.get("/books/{book_id}", response_model=Book)
@@ -50,6 +52,9 @@ def create_loan_api(loan_data: LoanCreate, db: Session = Depends(get_db)):
 
 @app.put("/return_loans/{item_id}", response_model=None)
 def return_item_api(item_id: str, db: Session = Depends(get_db)):
+    loan = get_loan(db, item_id)
+    if not loan:
+        raise HTTPException(status_code=404, detail="Loan not found")
     response = requests.put(url=f"http://central-library:81/central/return_item/{item_id}").status_code
     if response == 200:
         return_loan(db, item_id)

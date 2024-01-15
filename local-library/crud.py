@@ -5,8 +5,11 @@ from models import Book, Loan
 from schemas import BookCreate, LoanCreate
 import uuid
 
+def check_book_isbn(db: Session, isbn: str):
+    return db.query(Book).filter(Book.isbn == isbn).first()
+
 def create_book(db: Session, book_data: BookCreate):
-    db_book = Book(id=uuid.uuid4(), title=book_data.title, author=book_data.author)
+    db_book = Book(id=uuid.uuid4().hex, title=book_data.title, author=book_data.author, isbn = book_data.isbn)
     db.add(db_book)
     db.commit()
     db.refresh(db_book)

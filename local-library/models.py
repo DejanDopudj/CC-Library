@@ -6,15 +6,16 @@ from datetime import date
 
 
 class Book(Base):
-    __tablename__ = "book"
+    __tablename__ = "bookT"
     id = Column(String(160), primary_key=True, default=uuid4)
     title = Column(String(160))
     author = Column(String(160))
+    isbn = Column(String(160), unique = True)
 
 
 class Loan(Base):
-    __tablename__ = "loan"
+    __tablename__ = "loanT"
     id = Column(String(160), primary_key=True, default=uuid4)
-    book_id = Column(String(160), ForeignKey("book.id"))
+    book_id = Column(String(160), ForeignKey("bookT.id"))
     date_took = Column(Date, default=date.today())
     date_returned = Column(Date, default=None)
